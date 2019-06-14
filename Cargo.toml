@@ -5,3 +5,7 @@ authors = ["Daijiro Chiba <chiba_daijiro@cyberagent.co.jp>"]
 edition = "2018"
 
 [dependencies]
+github-rs = "0.7"
+serde_json = "1.0"
+hyper = "0.12.29"
+regex = "1"
