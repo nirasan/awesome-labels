@@ -29,24 +29,36 @@ impl Client {
         let issues = json.as_array()?;
         let mut result = vec![];
         for issue in issues {
-            let issue: Issue = serde_json::from_value(issue.to_owned()).unwrap();
+            let issue: Issue = serde_json::from_value(issue.to_owned()).ok()?;
             result.push(issue);
         }
         return Some(result);
+    }
+
+    fn get_contents(&self, owner: &str, repo_name: &str, path: &str) -> Option<Content> {
+        let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
+        let response = self
+            .github
+            .get()
+            .custom_endpoint(&endpoint)
+            .execute::<Value>();
+        let json= Self::get_json(response)?;
+        let content: Content = serde_json::from_value(json).ok()?;
+        return Some(content);
     }
 
     fn get_json (
         response: Result<(HeaderMap, StatusCode, Option<Value>), github_rs::errors::Error>,
     ) -> Option<Value> {
         match response {
-            Ok((headers, status, json)) => {
+            Ok((_, status, json)) => {
                 if status.is_success() {
                     json
                 } else {
                     None
                 }
             }
-            Err(e) => {
+            Err(_) => {
                 None
             }
         }
@@ -66,6 +78,17 @@ fn test_get_issues() {
     }
 }
 
+#[test]
+fn test_get_contents() {
+    let content = std::fs::read_to_string("./secret.txt").ok().unwrap();
+    let client = Client::new(&content);
+    let contents = client.get_contents("nirasan", "awesome-labels", "docs/test.md");
+    assert!(contents.is_some());
+    let contents = contents.unwrap();
+    // println!("{}", serde_json::to_string_pretty(&contents).unwrap());
+    println!("{:?}", contents);
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Issue {
     labels: Vec<Label>
@@ -75,4 +98,9 @@ struct Issue {
 struct Label {
     color: String,
     name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Content {
+    sha: String,
 }
