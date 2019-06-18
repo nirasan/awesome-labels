@@ -15,7 +15,7 @@ impl Client {
     }
 
     //get all issues for repo
-    fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<Value>> {
+    fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<Issue>> {
         //endpoint found on https://developer.github.com/v3/issues/#list-issues-for-a-repository
         let issues_endpoint = format!("repos/{}/{}/issues", owner, repo_name);
         //execute
@@ -27,7 +27,12 @@ impl Client {
             .execute::<Value>();
         let json = Self::get_json(response)?;
         let issues = json.as_array()?;
-        Some(issues.to_owned())
+        let mut result = vec![];
+        for issue in issues {
+            let issue: Issue = serde_json::from_value(issue.to_owned()).unwrap();
+            result.push(issue);
+        }
+        return Some(result);
     }
 
     fn get_json (
@@ -52,9 +57,22 @@ impl Client {
 fn test_get_issues() {
     let content = std::fs::read_to_string("./secret.txt").ok().unwrap();
     let client = Client::new(&content);
-    let res = client.get_issues("rust-lang", "rfcs");
-    assert_ne!(res, None);
-    let res = res.unwrap();
-    assert!(res.len() > 0);
-    println!("{:?}", res);
+    let issues = client.get_issues("rust-lang", "rfcs");
+    assert!(issues.is_some());
+    let issues = issues.unwrap();
+    assert!(issues.len() > 0);
+    for issue in issues {
+        println!("{:?}", issue);
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Issue {
+    labels: Vec<Label>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Label {
+    color: String,
+    name: String,
 }
