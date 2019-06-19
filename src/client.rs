@@ -47,6 +47,19 @@ impl Client {
         return Some(content);
     }
 
+    fn put_contents(&self, owner: &str, repo_name: &str, path: &str, payload: ContentPayload) -> Option<()> {
+        let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
+        let response = self
+            .github
+            .put(payload)
+            .custom_endpoint(&endpoint)
+            .execute::<Value>();
+        println!("[response] {:?}", response);
+        let json= Self::get_json(response)?;
+        println!("{}", serde_json::to_string_pretty(&json).unwrap());
+        return Some(());
+    }
+
     fn get_json (
         response: Result<(HeaderMap, StatusCode, Option<Value>), github_rs::errors::Error>,
     ) -> Option<Value> {
@@ -89,6 +102,31 @@ fn test_get_contents() {
     println!("{:?}", contents);
 }
 
+#[test]
+fn test_put_contents() {
+    let content = std::fs::read_to_string("./secret.txt").ok().unwrap();
+    let client = Client::new(&content);
+    let content = client.get_contents("nirasan", "awesome-labels", "docs/test.md").unwrap();
+    let file_content = r##"# header
+
+## header
+
+* list
+  * sub list
+  * sub list
+* list
+  * new sub list
+  * test sub list"##;
+    let message = format!("test message. sha is {}", &content.sha);
+    let payload = ContentPayload{
+        sha: content.sha,
+        message: message,
+        content: base64::encode(file_content),
+    };
+    let contents = client.put_contents("nirasan", "awesome-labels", "docs/test.md", payload);
+    assert!(contents.is_some());
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Issue {
     labels: Vec<Label>
@@ -102,5 +140,12 @@ struct Label {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Content {
+    sha: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ContentPayload {
+    message: String,
+    content: String,
     sha: String,
 }

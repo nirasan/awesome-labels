@@ -25,6 +25,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "awesome-labels"
 version = "0.1.0"
 dependencies = [
+ "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "github-rs 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.12.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 1.1.7 (registry+https://github.com/rust-lang/crates.io-index)",

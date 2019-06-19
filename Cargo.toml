@@ -5,6 +5,7 @@ authors = ["Daijiro Chiba <chiba_daijiro@cyberagent.co.jp>"]
 edition = "2018"
 
 [dependencies]
+base64 = "0.10"
 github-rs = "0.7"
 serde = "1.0"
 serde_derive = "1.0"
