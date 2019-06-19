@@ -4,3 +4,6 @@ extern crate serde;
 
 mod client;
 mod parser;
+mod structs;
+mod renderer;
+

@@ -1,6 +1,7 @@
 use github_rs::client::{Executor, Github};
 use github_rs::{HeaderMap, StatusCode};
 use serde_json::Value;
+use structs::*;
 
 struct Client {
     github: Github
@@ -125,27 +126,4 @@ fn test_put_contents() {
     };
     let contents = client.put_contents("nirasan", "awesome-labels", "docs/test.md", payload);
     assert!(contents.is_some());
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Issue {
-    labels: Vec<Label>
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Label {
-    color: String,
-    name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Content {
-    sha: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ContentPayload {
-    message: String,
-    content: String,
-    sha: String,
 }
