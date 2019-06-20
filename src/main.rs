@@ -4,6 +4,10 @@ use hyper::header::{HeaderValue, ACCEPT};
 use serde_json::Value;
 use std::fs;
 
+fn main() {
+
+}
+
 #[test]
 fn test_regex_github() {
     let content = fs::read_to_string("./secret.txt").ok().unwrap();

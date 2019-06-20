@@ -2,8 +2,7 @@ extern crate base64;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 
-mod client;
-mod parser;
-mod structs;
-mod renderer;
+pub mod client;
+pub mod parser;
+pub mod structs;
 

@@ -1,14 +1,14 @@
 use github_rs::client::{Executor, Github};
 use github_rs::{HeaderMap, StatusCode};
 use serde_json::Value;
-use structs::*;
+use crate::structs::*;
 
-struct Client {
+pub struct Client {
     github: Github
 }
 
 impl Client {
-    fn new(token: &str) -> Client {
+    pub fn new(token: &str) -> Client {
         let github = Github::new(token).ok().expect("failed to create github client");
         Client{
             github
@@ -16,7 +16,7 @@ impl Client {
     }
 
     //get all issues for repo
-    fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<Issue>> {
+    pub fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<Issue>> {
         //endpoint found on https://developer.github.com/v3/issues/#list-issues-for-a-repository
         let issues_endpoint = format!("repos/{}/{}/issues", owner, repo_name);
         //execute
@@ -36,7 +36,7 @@ impl Client {
         return Some(result);
     }
 
-    fn get_contents(&self, owner: &str, repo_name: &str, path: &str) -> Option<Content> {
+    pub fn get_contents(&self, owner: &str, repo_name: &str, path: &str) -> Option<Content> {
         let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
         let response = self
             .github
@@ -48,7 +48,7 @@ impl Client {
         return Some(content);
     }
 
-    fn put_contents(&self, owner: &str, repo_name: &str, path: &str, payload: ContentPayload) -> Option<()> {
+    pub fn put_contents(&self, owner: &str, repo_name: &str, path: &str, payload: ContentPayload) -> Option<()> {
         let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
         let response = self
             .github

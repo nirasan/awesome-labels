@@ -1,8 +1,8 @@
-struct Parser {
+pub struct Parser {
 }
 
 impl Parser {
-    fn parse_github_owner_and_repo(input: &str) -> Option<Vec<(String, String)>> {
+    pub fn parse_github_owner_and_repo(input: &str) -> Option<Vec<(String, String)>> {
         let mut result = vec![];
         let re = regex::Regex::new(r"https://github.com/([\w\s\-_]+)/([\w\s\-_]+)").ok()?;
         for cap in re.captures_iter(&input) {
