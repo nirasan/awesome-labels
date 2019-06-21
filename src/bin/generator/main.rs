@@ -1,7 +1,6 @@
 extern crate awesome_labels;
 extern crate reqwest;
 
-use awesome_labels::structs::*;
 use awesome_labels::client::Client;
 use awesome_labels::parser::Parser;
 use std::fs;
@@ -58,10 +57,20 @@ fn main() {
         }
     }
 
-    let mut f = BufWriter::new(fs::File::create(file).unwrap());
+    let mut count_vec: Vec<_> = total_count_table.iter().collect();
+    count_vec.sort_by(|a, b| b.1.cmp(a.1));
 
-    writeln!(f, "[total count] {:?}", total_count_table).unwrap();
-    writeln!(f, "[repo count] {:?}", repo_count_table).unwrap();
+    let mut f = BufWriter::new(fs::File::create(file).unwrap());
+    
+    writeln!(f, "|label name|issues count|repos count|").unwrap();
+    writeln!(f, "|---|---|---|").unwrap();
+
+    for pair in count_vec {
+        let name = pair.0;
+        let issues = *total_count_table.get(name).unwrap_or(&0);
+        let repos = *repo_count_table.get(name).unwrap_or(&0);
+        writeln!(f, "|{}|{}|{}|", name, issues, repos).unwrap();
+    }
 
     f.flush().expect("failed to flush");
 }
