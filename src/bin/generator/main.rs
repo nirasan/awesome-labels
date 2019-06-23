@@ -23,8 +23,8 @@ fn main() {
 
     let client = Client::new(token);
 
-    let mut total_count_table: HashMap<String, i32> = HashMap::new();
-    let mut repo_count_table: HashMap<String, i32> = HashMap::new();
+    let mut issues_counter: HashMap<String, i32> = HashMap::new();
+    let mut repos_counter: HashMap<String, i32> = HashMap::new();
 
     for (owner, repo) in &map {
         let issues = client.get_issues(owner, repo);
@@ -38,26 +38,18 @@ fn main() {
             for label in issue.labels {
                 let name = &label.name;
                 repo_table.insert(name.to_owned(), true);
-                let count = total_count_table.get(name);
-                let count = match count {
-                    Some(n) => n + 1,
-                    None => 1,
-                };
-                total_count_table.insert(name.to_owned(), count);
+                let count = *issues_counter.get(name).unwrap_or(&0) + 1;
+                issues_counter.insert(name.to_owned(), count);
             }
         }
 
         for (name, _) in &repo_table {
-            let count = repo_count_table.get(name);
-            let count = match count {
-                Some(n) => n + 1,
-                None => 1,
-            };
-            repo_count_table.insert(name.to_owned(), count);
+            let count = *repos_counter.get(name).unwrap_or(&0) + 1;
+            repos_counter.insert(name.to_owned(), count);
         }
     }
 
-    let mut count_vec: Vec<_> = total_count_table.iter().collect();
+    let mut count_vec: Vec<_> = issues_counter.iter().collect();
     count_vec.sort_by(|a, b| b.1.cmp(a.1));
 
     let mut f = BufWriter::new(fs::File::create(file).unwrap());
@@ -67,8 +59,8 @@ fn main() {
 
     for pair in count_vec {
         let name = pair.0;
-        let issues = *total_count_table.get(name).unwrap_or(&0);
-        let repos = *repo_count_table.get(name).unwrap_or(&0);
+        let issues = *issues_counter.get(name).unwrap_or(&0);
+        let repos = *repos_counter.get(name).unwrap_or(&0);
         writeln!(f, "|{}|{}|{}|", name, issues, repos).unwrap();
     }
 
