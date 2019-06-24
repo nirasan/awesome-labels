@@ -16,7 +16,7 @@ impl Client {
     }
 
     //get all issues for repo
-    pub fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<Issue>> {
+    pub fn get_issues(&self, owner: &str, repo_name: &str) -> Option<Vec<GithubIssue>> {
         //endpoint found on https://developer.github.com/v3/issues/#list-issues-for-a-repository
         let issues_endpoint = format!("repos/{}/{}/issues", owner, repo_name);
         //execute
@@ -30,13 +30,13 @@ impl Client {
         let issues = json.as_array()?;
         let mut result = vec![];
         for issue in issues {
-            let issue: Issue = serde_json::from_value(issue.to_owned()).ok()?;
+            let issue: GithubIssue = serde_json::from_value(issue.to_owned()).ok()?;
             result.push(issue);
         }
         return Some(result);
     }
 
-    pub fn get_contents(&self, owner: &str, repo_name: &str, path: &str) -> Option<Content> {
+    pub fn get_contents(&self, owner: &str, repo_name: &str, path: &str) -> Option<GithubContent> {
         let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
         let response = self
             .github
@@ -44,11 +44,11 @@ impl Client {
             .custom_endpoint(&endpoint)
             .execute::<Value>();
         let json= Self::get_json(response)?;
-        let content: Content = serde_json::from_value(json).ok()?;
+        let content: GithubContent = serde_json::from_value(json).ok()?;
         return Some(content);
     }
 
-    pub fn put_contents(&self, owner: &str, repo_name: &str, path: &str, payload: ContentPayload) -> Option<()> {
+    pub fn put_contents(&self, owner: &str, repo_name: &str, path: &str, payload: GithubContentPayload) -> Option<()> {
         let endpoint = format!("repos/{}/{}/contents/{}", owner, repo_name, path);
         let response = self
             .github
@@ -119,7 +119,7 @@ fn test_put_contents() {
   * new sub list
   * test sub list"##;
     let message = format!("test message. sha is {}", &content.sha);
-    let payload = ContentPayload{
+    let payload = GithubContentPayload {
         sha: content.sha,
         message: message,
         content: base64::encode(file_content),

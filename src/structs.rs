@@ -1,21 +1,21 @@
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Issue {
-    pub labels: Vec<Label>
+pub struct GithubIssue {
+    pub labels: Vec<GithubLabel>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Label {
+pub struct GithubLabel {
     pub color: String,
     pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Content {
+pub struct GithubContent {
     pub sha: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContentPayload {
+pub struct GithubContentPayload {
     pub message: String,
     pub content: String,
     pub sha: String,
