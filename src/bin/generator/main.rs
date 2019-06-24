@@ -6,6 +6,7 @@ use awesome_labels::parser::Parser;
 use std::fs;
 use std::io::{BufWriter, Write};
 use std::collections::HashMap;
+use url::form_urlencoded::byte_serialize;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -54,14 +55,18 @@ fn main() {
 
     let mut f = BufWriter::new(fs::File::create(file).unwrap());
     
-    writeln!(f, "|label name|issues count|repos count|").unwrap();
-    writeln!(f, "|---|---|---|").unwrap();
+    writeln!(f, "|label name|issues count|repos count|url|").unwrap();
+    writeln!(f, "|---|---|---|---|").unwrap();
 
     for pair in count_vec {
         let name = pair.0;
         let issues = *issues_counter.get(name).unwrap_or(&0);
         let repos = *repos_counter.get(name).unwrap_or(&0);
-        writeln!(f, "|{}|{}|{}|", name, issues, repos).unwrap();
+
+        let query: String = byte_serialize(format!(r#"is:issue is:open label:"{}""#, name).as_bytes()).collect();
+        let url = format!("https://github.com/search?q={}", query);
+
+        writeln!(f, "|{}|{}|{}|{}|", name, issues, repos, url).unwrap();
     }
 
     f.flush().expect("failed to flush");
