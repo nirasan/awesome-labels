@@ -75,7 +75,6 @@ fn main() {
     let json = serde_json::to_string(&labels).expect("failed to encoding json");
     writeln!(f, "{}", json).unwrap();
 
-
     /*
     writeln!(f, "|label name|issues count|repos count|url|").unwrap();
     writeln!(f, "|---|---|---|---|").unwrap();
