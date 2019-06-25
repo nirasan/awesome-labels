@@ -20,3 +20,11 @@ pub struct GithubContentPayload {
     pub content: String,
     pub sha: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Label {
+    pub name: String,
+    pub issues_count: i32,
+    pub repos_count: i32,
+    pub url: String,
+}

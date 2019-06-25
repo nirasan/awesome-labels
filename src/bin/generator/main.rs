@@ -7,6 +7,7 @@ use std::fs;
 use std::io::{BufWriter, Write};
 use std::collections::HashMap;
 use url::form_urlencoded::byte_serialize;
+use awesome_labels::structs::Label;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -53,8 +54,29 @@ fn main() {
     let mut count_vec: Vec<_> = issues_counter.iter().collect();
     count_vec.sort_by(|a, b| b.1.cmp(a.1));
 
+    let mut labels = vec![];
+    for pair in count_vec {
+        let name = pair.0.to_owned();
+
+        let issues_count = *issues_counter.get(&name).unwrap_or(&0);
+        let repos_count = *repos_counter.get(&name).unwrap_or(&0);
+
+        let query: String = byte_serialize(format!(r#"is:issue is:open label:"{}""#, name).as_bytes()).collect();
+        let url = format!("https://github.com/search?q={}", query);
+
+        labels.push(Label{
+            name,
+            issues_count,
+            repos_count,
+            url,
+        });
+    }
     let mut f = BufWriter::new(fs::File::create(file).unwrap());
-    
+    let json = serde_json::to_string(&labels).expect("failed to encoding json");
+    writeln!(f, "{}", json).unwrap();
+
+
+    /*
     writeln!(f, "|label name|issues count|repos count|url|").unwrap();
     writeln!(f, "|---|---|---|---|").unwrap();
 
@@ -68,6 +90,7 @@ fn main() {
 
         writeln!(f, "|{}|{}|{}|{}|", name, issues, repos, url).unwrap();
     }
+    */
 
     f.flush().expect("failed to flush");
 }
