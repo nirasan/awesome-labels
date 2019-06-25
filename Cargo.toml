@@ -5,8 +5,8 @@ authors = ["Daijiro Chiba <chiba_daijiro@cyberagent.co.jp>"]
 edition = "2018"
 
 [[bin]]
-name = "awesome-labels-generator"
-path = "src/bin/generator/main.rs"
+name = "awesome-labels-runner"
+path = "src/bin/runner/main.rs"
 
 [dependencies]
 base64 = "0.10"

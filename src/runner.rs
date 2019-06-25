@@ -4,7 +4,7 @@ use crate::structs::*;
 use std::collections::HashMap;
 use url::form_urlencoded::byte_serialize;
 
-struct Runner {
+pub struct Runner {
     token: String,
 }
 
