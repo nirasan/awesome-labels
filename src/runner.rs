@@ -3,19 +3,26 @@ use crate::parser::Parser;
 use crate::structs::*;
 use std::collections::HashMap;
 use url::form_urlencoded::byte_serialize;
+use hyper_tls::HttpsConnector;
+use hyper::Client;
 
 pub struct Runner {
     token: String,
 }
 
 impl Runner {
-    pub fn new(token: String) -> Runner {
+    pub fn new(token: &str) -> Runner {
         Runner{
-            token
+            token: token.to_string(),
         }
     }
 
     pub fn run(&self, url: &str) -> Vec<Label> {
+        let https = HttpsConnector::new(4).unwrap();
+        let hyper_client = Client::builder()
+            .build::<_, hyper::Body>(https);
+
+
         let body = reqwest::get(url).expect("failed to get request").text().expect("failed to get text");
         let map = Parser::parse_github_owner_and_repo(&body).expect("failed to parse owner and repo");
 

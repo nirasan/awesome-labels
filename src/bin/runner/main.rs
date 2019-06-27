@@ -13,7 +13,7 @@ fn main() {
     let token = &args[2];
     let file = &args[3];
 
-    let runner = Runner::new(token.to_owned());
+    let runner = Runner::new(token);
     let labels = runner.run(url);
 
     let mut f = BufWriter::new(fs::File::create(file).unwrap());
